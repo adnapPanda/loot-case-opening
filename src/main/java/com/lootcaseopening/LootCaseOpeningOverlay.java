@@ -28,9 +28,9 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 public class LootCaseOpeningOverlay extends Overlay implements KeyListener
 {
     // Spin panel dimensions
-    private static final int VIEWPORT_WIDTH = 500;
-    private static final int VIEWPORT_HEIGHT = 100;
-    private static final int ITEM_HEIGHT = 80;
+    private static final int VIEWPORT_WIDTH = 620;
+    private static final int VIEWPORT_HEIGHT = 130;
+    private static final int ITEM_HEIGHT = 100;
 
     // Reveal panel dimensions
     private static final int REVEAL_WIDTH = 320;
@@ -38,10 +38,14 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     private static final long REVEAL_ANIM_MS = 450;
     private static final int REVEAL_IMAGE_SIZE = 100;
 
+    //The icon displayed is slightly off-center, hence add a offset to correct
+    private static final int IMAGE_X_OFFSET = 7;
+
     private final Client client;
 
     private LootCaseAnimator animator;
     private Consumer<LootItem> onComplete;
+    private Runnable onClose;
 
     private boolean revealed = false;
     private LootItem revealedItem;
@@ -55,13 +59,15 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
     }
 
-    public void open(List<LootItem> pool, LootItem winningItem, Consumer<LootItem> onComplete)
+    public void open(List<LootItem> pool, LootItem winningItem, Consumer<LootItem> onComplete, Runnable onClose)
     {
         this.animator = new LootCaseAnimator(pool, winningItem);
         this.animator.start();
         this.onComplete = onComplete;
+        this.onClose = onClose;
         this.revealed = false;
         this.revealedItem = null;
+        centerPanel(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     }
 
     public boolean isActive()
@@ -74,6 +80,14 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         animator = null;
         revealed = false;
         revealedItem = null;
+
+        if (onClose != null)
+        {
+            Runnable callback = onClose;
+            onClose = null; // avoid double-firing if close() is called again
+            callback.run();
+        }
+
     }
 
     @Override
@@ -90,9 +104,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         int panelHeight = revealed ? REVEAL_HEIGHT : VIEWPORT_HEIGHT;
 
         // Center on the game canvas every frame (panel size differs between phases).
-        int x = (client.getCanvasWidth() - panelWidth) / 2;
-        int y = (client.getCanvasHeight() - panelHeight) / 2;
-        setPreferredLocation(new Point(x, y));
+        centerPanel(panelWidth, panelHeight);
 
         if (!revealed)
         {
@@ -125,12 +137,19 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         return new Dimension(panelWidth, panelHeight);
     }
 
+    private void centerPanel(int panelWidth, int panelHeight)
+    {
+        int x = (client.getCanvasWidth() - panelWidth) / 2;
+        int y = (client.getCanvasHeight() - panelHeight) / 2;
+        setPreferredLocation(new Point(x, y));
+    }
+
+
     private LootItem getWinningItem()
     {
         List<LootItem> reel = animator.getReel();
         int stride = animator.getSlotStride();
-        double centerX = animator.getOffsetPx() + VIEWPORT_WIDTH / 2.0;
-        int index = (int) Math.round(animator.getOffsetPx() / stride);;
+        int index = (int) Math.round(animator.getOffsetPx() / stride);
         index = Math.max(0, Math.min(reel.size() - 1, index));
         return reel.get(index);
     }
@@ -253,7 +272,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
             int size = (int) Math.round(REVEAL_IMAGE_SIZE * scale);
             if (size > 0)
             {
-                g.drawImage(image, centerX - size / 2, centerY - size / 2, size, size, null);
+                g.drawImage(image, centerX - size / 2 + IMAGE_X_OFFSET, centerY - size / 2, size, size, null);
             }
         }
 

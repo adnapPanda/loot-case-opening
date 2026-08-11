@@ -9,13 +9,15 @@ public class LootItem
     private final String name;
     private final BufferedImage image;
     private final Rarity rarity;
+    private final Color rarityColor;
 
-    public LootItem(int itemId, String name, BufferedImage image, Rarity rarity)
+    public LootItem(int itemId, String name, BufferedImage image, Rarity rarity, Color rarityColor)
     {
         this.itemId = itemId;
         this.name = name;
         this.image = image;
         this.rarity = rarity;
+        this.rarityColor = rarityColor;
     }
 
     public int getItemId()
@@ -40,6 +42,6 @@ public class LootItem
 
     public Color getRarityColor()
     {
-        return rarity.getColor();
+        return rarityColor;
     }
 }

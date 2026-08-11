@@ -101,11 +101,11 @@ public final class LootTables
             new LootEntry(ItemID.BARROWS_VERAC_HEAD, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_LEGS, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_WEAPON, Rarity.RARE),
-            new LootEntry(ItemID.MINDRUNE, Rarity.COMMON),
-            new LootEntry(ItemID.CHAOSRUNE, Rarity.COMMON),
-            new LootEntry(ItemID.DEATHRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.DRAGON_MED_HELM, Rarity.UNCOMMON),
             new LootEntry(ItemID.BLOODRUNE, Rarity.COMMON),
-            new LootEntry(ItemID.DRAGON_MED_HELM, Rarity.UNCOMMON)
+            new LootEntry(ItemID.DEATHRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.CHAOSRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.MINDRUNE, Rarity.COMMON)
     );
 
     private LootTables()

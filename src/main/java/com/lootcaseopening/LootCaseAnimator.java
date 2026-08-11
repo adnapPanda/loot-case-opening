@@ -5,8 +5,8 @@ import java.util.List;
 
 public class LootCaseAnimator
 {
-    private static final int ITEM_WIDTH = 80;
-    private static final int ITEM_SPACING = 8;
+    private static final int ITEM_WIDTH = 100;
+    private static final int ITEM_SPACING = 10;
     private static final int SLOT_STRIDE = ITEM_WIDTH + ITEM_SPACING;
 
     // How many filler items scroll past before landing on the winner.
@@ -14,7 +14,8 @@ public class LootCaseAnimator
     // Winner is placed near the end so there's room to overshoot slightly less at the finish.
     private static final int WINNER_INDEX = REEL_LENGTH - 6;
 
-    private static final long DURATION_MS = 6500; // total spin time
+    private static final long DURATION_MS = 6000; // total spin time
+    private static final double TRANSITION_PERCENTAGE = 0.87; // At what percentage of the spin to transition to the reveal panel
 
     private final List<LootItem> reel = new ArrayList<>();
 
@@ -51,7 +52,7 @@ public class LootCaseAnimator
             start();
         }
         long elapsedMs = (System.nanoTime() - startTimeNanos) / 1_000_000L;
-        if (elapsedMs >= DURATION_MS)
+        if (elapsedMs >= DURATION_MS * TRANSITION_PERCENTAGE)
         {
             finished = true;
         }
