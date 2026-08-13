@@ -2,6 +2,7 @@ package com.lootcaseopening;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LootCaseAnimator
 {
@@ -11,11 +12,15 @@ public class LootCaseAnimator
 
     // How many filler items scroll past before landing on the winner.
     private static final int REEL_LENGTH = 50;
-    // Winner is placed near the end so there's room to overshoot slightly less at the finish.
     private static final int WINNER_INDEX = REEL_LENGTH - 6;
 
     private static final long DURATION_MS = 6000; // total spin time
     private static final double TRANSITION_PERCENTAGE = 0.87; // At what percentage of the spin to transition to the reveal panel
+
+    private static final Random RANDOM = new Random();
+    private static final double WINNING_ITEM_DEVIATION = ITEM_WIDTH * 0.3;
+    //Make sure the winning spin doesn't always land in the exact middle
+    private final double landingDeviation = (RANDOM.nextDouble() * 2 - 1) * WINNING_ITEM_DEVIATION;
 
     private final List<LootItem> reel = new ArrayList<>();
 
@@ -70,9 +75,14 @@ public class LootCaseAnimator
         double t = Math.min(1.0, elapsedMs / (double) DURATION_MS);
         double eased = easeOutQuint(t);
 
-        double targetOffset = WINNER_INDEX * SLOT_STRIDE;
+        double targetOffset = WINNER_INDEX * SLOT_STRIDE + landingDeviation;
 
         return eased * targetOffset;
+    }
+
+    public void skipToEnd()
+    {
+        startTimeNanos = System.nanoTime() - (DURATION_MS * 1_000_000L);
     }
 
     public List<LootItem> getReel()

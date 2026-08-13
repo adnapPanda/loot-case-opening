@@ -1,9 +1,12 @@
 package com.lootcaseopening;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import javax.inject.Inject;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
@@ -14,6 +17,8 @@ import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
+import net.runelite.api.widgets.WidgetUtil;
+import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -49,7 +54,14 @@ public class LootCaseOpeningPlugin extends Plugin
 	@Inject
 	private KeyManager keyManager;
 
+	@Inject
+	private AudioPlayer audioPlayer;
+
+	//TODO: Placeholder
+	private static final String LEGENDARY_SOUND_FILE = "legendary.wav";
+
 	private Widget hiddenRewardWidget;
+	private Integer hideComponentID;
 
 	private static final List<List<LootEntry>> ALL_LOOT_TABLES = Arrays.asList(
 			CORRUPTED_GAUNTLET, THEATRE_OF_BLOOD, CHAMBERS_OF_XERIC,
@@ -62,13 +74,26 @@ public class LootCaseOpeningPlugin extends Plugin
 	private static final Set<Integer> MOONS_MAP_REGION = ImmutableSet.of(5780, 5781, 5782, 6036, 6037, 6038, 6292, 6293, 6294);
 	private static final Set<Integer> BARROWS_MAP_REGION = ImmutableSet.of(13974, 13975, 13976, 14230, 14231, 14232, 14486, 14487, 14488);
 	private static final Set<Integer> TOB_MAP_REGION = ImmutableSet.of(12867);
+	private static final Set<Integer> TOA_MAP_REGION = ImmutableSet.of(15184, 15696, 14672);
 
+	private List<LocationCheck> locationCheck;
 
 	@Override
 	protected void startUp()
 	{
 		overlayManager.add(caseOpeningOverlay);
 		keyManager.registerKeyListener(caseOpeningOverlay);
+
+		//Construct LocationCheck class to verify that client is in specific region when onLootReceived event is called
+		locationCheck = Arrays.asList(
+				new LocationCheck(CORRUPTED_GAUNTLET, () -> checkInRegion(CG_MAP_REGION)),
+				new LocationCheck(MOONS_OF_PERIL, () -> checkInRegion(MOONS_MAP_REGION)),
+				new LocationCheck(BARROWS_CHEST, () -> checkInRegion(BARROWS_MAP_REGION)),
+				new LocationCheck(CHAMBERS_OF_XERIC, () -> client.getVarbitValue(VarbitID.RAIDS_CLIENT_INDUNGEON) == 1),
+				new LocationCheck(THEATRE_OF_BLOOD, () -> checkInRegion(TOB_MAP_REGION)),
+				new LocationCheck(TOMBS_OF_AMASCUT, () -> checkInRegion(TOA_MAP_REGION))
+		);
+
 	}
 
 	@Override
@@ -86,34 +111,51 @@ public class LootCaseOpeningPlugin extends Plugin
 			Random r = new Random();
 			List<LootEntry> table = ALL_LOOT_TABLES.get(r.nextInt(ALL_LOOT_TABLES.size()));
 			LootEntry entry = table.get(r.nextInt(table.size()));
-			openCase(table, entry.getItemId());
-			checkInBarrows();
+			openCase(table, entry.getItemId(), interfaceIDFor(table));
 		}
 	}
+
+	private Integer interfaceIDFor(List<LootEntry> lootTable)
+	{
+		if (lootTable == BARROWS_CHEST)
+		{
+			return InterfaceID.BarrowsReward.UNIVERSE;
+		}
+		if (lootTable == MOONS_OF_PERIL)
+		{
+			return InterfaceID.PmoonReward.UNIVERSAL;
+		}
+		if (lootTable == CHAMBERS_OF_XERIC)
+		{
+			return InterfaceID.RaidsRewards.UNIVERSE;
+		}
+		if (lootTable == THEATRE_OF_BLOOD)
+		{
+			return InterfaceID.TobChests.UNIVERSE;
+		}
+		if (lootTable == TOMBS_OF_AMASCUT)
+		{
+			return InterfaceID.ToaChests.UNIVERSE;
+		}
+		//CG has no widget
+		return null;
+	}
+
 
 	@Subscribe
 	public void onWidgetLoaded(WidgetLoaded widgetLoaded)
 	{
-		switch (widgetLoaded.getGroupId())
+		if (hideComponentID == null)
 		{
-			case InterfaceID.BARROWS_REWARD:
-				hideRewardWidget(InterfaceID.BarrowsReward.UNIVERSE);
-				break;
-			case InterfaceID.PMOON_REWARD:
-				hideRewardWidget(InterfaceID.PmoonReward.UNIVERSAL);
-				break;
-			case InterfaceID.RAIDS_REWARDS:
-				hideRewardWidget(InterfaceID.RaidsRewards.UNIVERSE);
-				break;
-			case InterfaceID.TOB_CHESTS:
-				hideRewardWidget(InterfaceID.TobChests.UNIVERSE);
-				break;
-			case InterfaceID.TOA_CHESTS:
-				hideRewardWidget(InterfaceID.ToaChests.UNIVERSE);
-				break;
-			default:
-				break;
+			return;
 		}
+
+		int pendingGroupId = WidgetUtil.componentToInterface(hideComponentID);
+		if (widgetLoaded.getGroupId() == pendingGroupId)
+		{
+			hideRewardWidget(hideComponentID);
+		}
+
 	}
 
 	private void hideRewardWidget(int componentID)
@@ -125,6 +167,7 @@ public class LootCaseOpeningPlugin extends Plugin
 		}
 		widget.setHidden(true);
 		hiddenRewardWidget = widget;
+		hideComponentID = null;
 	}
 
 	private void unhideRewardWidget()
@@ -134,6 +177,7 @@ public class LootCaseOpeningPlugin extends Plugin
 			hiddenRewardWidget.setHidden(false);
 			hiddenRewardWidget = null;
 		}
+		hideComponentID = null;
 	}
 
 
@@ -141,160 +185,33 @@ public class LootCaseOpeningPlugin extends Plugin
 	@Subscribe
 	public void onLootReceived(LootReceived lootReceived)
 	{
-		System.out.println(lootReceived.getName());
-		System.out.println(lootReceived.getItems());
-		if (checkInCG()) {
-			System.out.println("In CG");
-			if (lootreceivedObjectNames.contains(lootReceived.getName())) {
-				// For each item defined in CORRUPTED_GAUNTLET, check whether it is part of the loot
-				// Checks from more rare to least rare. Ensures that the rarest item takes priority
-				outerloop:
-				for (LootEntry cgLoot: CORRUPTED_GAUNTLET)
-				{
-					for (ItemStack item : lootReceived.getItems())
-					{
-						int itemID = item.getId();
-						// Will always roll unless player died and didn't get crystal shards
-						if (cgLoot.getItemId() == itemID)
-						{
-							openCase(CORRUPTED_GAUNTLET, itemID);
-							//Stop both for loops since we only want to roll once
-							break outerloop;
-						}
-					}
-				}
-			}
-		}
+		if (!lootreceivedObjectNames.contains(lootReceived.getName())) return;
 
-		if (checkInMoons()) {
-			System.out.println("In Moons");
-			if (lootreceivedObjectNames.contains(lootReceived.getName())) {
-				outerloop:
-				for (LootEntry moonsLoot: MOONS_OF_PERIL)
-				{
-					for (ItemStack item : lootReceived.getItems())
-					{
-						int itemID = item.getId();
-						if (moonsLoot.getItemId() == itemID)
-						{
-							openCase(MOONS_OF_PERIL, itemID);
-							//Stop both for loops since we only want to roll once
-							break outerloop;
-						}
-					}
-				}
-			}
-
-		}
-
-		if (checkInBarrows()) {
-			System.out.println("In Barrows");
-			if (lootreceivedObjectNames.contains(lootReceived.getName())) {
-				outerloop:
-				for (LootEntry barrowsLoot: BARROWS_CHEST)
-				{
-					for (ItemStack item : lootReceived.getItems())
-					{
-						int itemID = item.getId();
-						if (barrowsLoot.getItemId() == itemID)
-						{
-							openCase(BARROWS_CHEST, itemID);
-							//Stop both for loops since we only want to roll once
-							break outerloop;
-						}
-					}
-				}
-			}
-		}
-		if (client.getVarbitValue(VarbitID.RAIDS_CLIENT_INDUNGEON) == 1)
+		for (LocationCheck check: locationCheck)
 		{
-			System.out.println("In cox");
-			if (lootreceivedObjectNames.contains(lootReceived.getName())) {
-				outerloop:
-				for (LootEntry raidsLoot: CHAMBERS_OF_XERIC)
-				{
-					for (ItemStack item : lootReceived.getItems())
-					{
-						int itemID = item.getId();
-						if (raidsLoot.getItemId() == itemID)
-						{
-							openCase(CHAMBERS_OF_XERIC, itemID);
-							//Stop both for loops since we only want to roll once
-							break outerloop;
-						}
-					}
-				}
-			}
-		}
-
-		if (checkInTOB())
-		{
-			System.out.println("In TOB");
-			System.out.println("loot received: " + lootReceived.getItems());
-			System.out.println("loot received: " + lootReceived.getName());
-			if (lootreceivedObjectNames.contains(lootReceived.getName())) {
-				outerloop:
-				for (LootEntry tobLoot: THEATRE_OF_BLOOD)
-				{
-					for (ItemStack item : lootReceived.getItems())
-					{
-						int itemID = item.getId();
-						if (tobLoot.getItemId() == itemID)
-						{
-							openCase(THEATRE_OF_BLOOD, itemID);
-							//Stop both for loops since we only want to roll once
-							break outerloop;
-						}
-					}
-				}
-			}
-		}
-
-	}
-
-	private boolean checkInBarrows() {
-		GameState gameState = client.getGameState();
-		if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING)
-		{
-			return false;
-		}
-
-		int[] currentMapRegions = client.getTopLevelWorldView().getMapRegions();
-		System.out.println(Arrays.toString(currentMapRegions));
-		// Verify that player is in Moons reward room
-		for (int region : currentMapRegions)
-		{
-			if (!BARROWS_MAP_REGION.contains(region))
+			if (check.isActive())
 			{
-				return false;
+				openCaseForTable(lootReceived, check.getLootTable());
 			}
 		}
-
-		return true;
 	}
 
-	private boolean checkInTOB() {
-		GameState gameState = client.getGameState();
-		if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING)
+	private void openCaseForTable(LootReceived lootReceived, List<LootEntry> lootTable)
+	{
+		for (LootEntry entry : lootTable)
 		{
-			return false;
-		}
-
-		int[] currentMapRegions = client.getTopLevelWorldView().getMapRegions();
-		System.out.println(Arrays.toString(currentMapRegions));
-		// Verify that player is in TOB reward room
-		for (int region : currentMapRegions)
-		{
-			if (!TOB_MAP_REGION.contains(region))
+			for (ItemStack item : lootReceived.getItems())
 			{
-				return false;
+				if (entry.getItemId() == item.getId())
+				{
+					openCase(lootTable, entry.getItemId(), interfaceIDFor(lootTable));
+					return;
+				}
 			}
 		}
-
-		return true;
 	}
 
-	private boolean checkInMoons() {
+	private boolean checkInRegion(Set<Integer> mapRegion) {
 		GameState gameState = client.getGameState();
 		if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING)
 		{
@@ -303,10 +220,9 @@ public class LootCaseOpeningPlugin extends Plugin
 
 		int[] currentMapRegions = client.getTopLevelWorldView().getMapRegions();
 
-		// Verify that player is in Moons reward room
 		for (int region : currentMapRegions)
 		{
-			if (!MOONS_MAP_REGION.contains(region))
+			if (!mapRegion.contains(region))
 			{
 				return false;
 			}
@@ -315,39 +231,35 @@ public class LootCaseOpeningPlugin extends Plugin
 		return true;
 	}
 
-	private boolean checkInCG() {
-		GameState gameState = client.getGameState();
-		if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING)
-		{
-			return false;
-		}
-
-		int[] currentMapRegions = client.getTopLevelWorldView().getMapRegions();
-
-		// Verify that player is in CG reward room
-		for (int region : currentMapRegions)
-		{
-			if (!CG_MAP_REGION.contains(region))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public void openCase(List<LootEntry> lootTable, int wonItemId)
+	public void openCase(List<LootEntry> lootTable, int wonItemId, Integer widgetComponentID)
 	{
 		List<LootItem> pool = buildItemPool(lootTable);
 		LootItem winner = resolveWinner(pool, wonItemId);
 
+		if (widgetComponentID != null)
+		{
+			hideComponentID = widgetComponentID;
+			hideRewardWidget(widgetComponentID);
+		}
+
 		caseOpeningOverlay.open(pool, winner, result ->
 		{
-			// Fires once, when the reel settles on `result`.
-			// e.g. show a chat message, play a sound, etc.
+			// TODO: skip playing sound for now
+//			if (result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
 		},
 		this::unhideRewardWidget
 	);
+	}
+
+	private void playLegendarySound()
+	{
+		try {
+			audioPlayer.play(getClass(), LEGENDARY_SOUND_FILE, 0f);
+		}
+		catch (IOException | UnsupportedAudioFileException | LineUnavailableException e)
+		{
+			//Do nothing and skip playing sound file
+		}
 	}
 
 	private LootItem resolveWinner(List<LootItem> pool, int wonItemId)
@@ -404,8 +316,6 @@ public class LootCaseOpeningPlugin extends Plugin
 				return rarity.getColor();
 		}
 	}
-
-
 
 	@Provides
 	LootCaseOpeningConfig provideConfig(ConfigManager configManager)

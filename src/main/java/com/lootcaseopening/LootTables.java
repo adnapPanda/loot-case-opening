@@ -105,7 +105,8 @@ public final class LootTables
             new LootEntry(ItemID.BLOODRUNE, Rarity.COMMON),
             new LootEntry(ItemID.DEATHRUNE, Rarity.COMMON),
             new LootEntry(ItemID.CHAOSRUNE, Rarity.COMMON),
-            new LootEntry(ItemID.MINDRUNE, Rarity.COMMON)
+            new LootEntry(ItemID.MINDRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.COINS, Rarity.COMMON)
     );
 
     private LootTables()

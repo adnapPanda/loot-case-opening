@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 import net.runelite.api.Client;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.input.KeyListener;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
@@ -42,6 +43,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     private static final int IMAGE_X_OFFSET = 7;
 
     private final Client client;
+    private final ClientThread clientThread;
 
     private LootCaseAnimator animator;
     private Consumer<LootItem> onComplete;
@@ -52,9 +54,10 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     private long revealStartTimeNanos;
 
     @Inject
-    public LootCaseOpeningOverlay(Client client)
+    public LootCaseOpeningOverlay(Client client, ClientThread clientThread)
     {
         this.client = client;
+        this.clientThread = clientThread;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
     }
@@ -70,11 +73,6 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         centerPanel(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     }
 
-    public boolean isActive()
-    {
-        return animator != null || revealed;
-    }
-
     public void close()
     {
         animator = null;
@@ -84,7 +82,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         if (onClose != null)
         {
             Runnable callback = onClose;
-            onClose = null; // avoid double-firing if close() is called again
+            onClose = null; // avoid double firing if close() is called again
             callback.run();
         }
 
@@ -301,11 +299,28 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     @Override
     public void keyPressed(KeyEvent e)
     {
-        if (revealed && e.getKeyCode() == KeyEvent.VK_ESCAPE)
+        if (e.getKeyCode() != KeyEvent.VK_ESCAPE)
+        {
+            return;
+        }
+
+        if (!revealed && animator == null)
+        {
+            return;
+        }
+
+        e.consume();
+        clientThread.invoke(() ->
+        {
+        if (revealed)
         {
             close();
-            e.consume();
         }
+        else if (animator != null)
+        {
+            animator.skipToEnd();
+        }});
+
     }
 
     @Override
