@@ -12,7 +12,7 @@ In Raids the game already shows you that there is a unique by recoloring the che
 - Theatre of Blood
 - Chambers of Xeric
 - Tombs of Amascut
-- Corrupted Gauntlet
+- Corrupted Gauntlet/Gauntlet
 - Moons of Peril
 - Barrows
 
