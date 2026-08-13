@@ -6,6 +6,8 @@ Behavior differs slightly by content:
 - **Corrupted Gauntlet, Barrows, and Moons of Peril** spin on every completion, including common loot
 - **Theatre of Blood, Chambers of Xeric, and Tombs of Amascut** only spin when you receive a unique drop
 
+In Raids the game already shows you that there is a unique by recoloring the chest, hence the plugin only spins for unique loot.
+
 ### Supported content
 - Theatre of Blood
 - Chambers of Xeric
@@ -16,6 +18,7 @@ Behavior differs slightly by content:
 
 ### How it works
 - Triggers automatically based on the rules above
+- Hides the in-game reward pop-up until the spin and reveal have finished
 - Press ESC at any time to skip the spin and jump straight to the result
 - Press ESC again to close the result panel
 - The colors of the different rarities can be adjusted in the config settings

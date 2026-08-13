@@ -4,15 +4,14 @@ import net.runelite.api.gameval.ItemID;
 
 import java.util.List;
 
-public final class LootTables
-{
+public final class LootTables {
     public static final List<LootEntry> CORRUPTED_GAUNTLET = List.of(
             new LootEntry(ItemID.PRIF_WEAPON_SEED_ENHANCED, Rarity.LEGENDARY),
             new LootEntry(ItemID.PRIF_ARMOUR_SEED, Rarity.RARE),
             new LootEntry(ItemID.GAUNTLETPET, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.CRYSTAL_SEED_OLD, Rarity.UNCOMMON),
             new LootEntry(ItemID.PRIF_CRYSTAL_SHARD, Rarity.COMMON)
-            );
+    );
 
     public static final List<LootEntry> THEATRE_OF_BLOOD = List.of(
             new LootEntry(ItemID.INFERNAL_DEFENDER, Rarity.UNCOMMON),
@@ -109,7 +108,6 @@ public final class LootTables
             new LootEntry(ItemID.COINS, Rarity.COMMON)
     );
 
-    private LootTables()
-    {
+    private LootTables() {
     }
 }

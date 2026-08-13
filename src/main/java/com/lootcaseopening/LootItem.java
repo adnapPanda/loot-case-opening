@@ -3,16 +3,14 @@ package com.lootcaseopening;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-public class LootItem
-{
+public class LootItem {
     private final int itemId;
     private final String name;
     private final BufferedImage image;
     private final Rarity rarity;
     private final Color rarityColor;
 
-    public LootItem(int itemId, String name, BufferedImage image, Rarity rarity, Color rarityColor)
-    {
+    public LootItem(int itemId, String name, BufferedImage image, Rarity rarity, Color rarityColor) {
         this.itemId = itemId;
         this.name = name;
         this.image = image;
@@ -20,28 +18,23 @@ public class LootItem
         this.rarityColor = rarityColor;
     }
 
-    public int getItemId()
-    {
+    public int getItemId() {
         return itemId;
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
-    public BufferedImage getImage()
-    {
+    public BufferedImage getImage() {
         return image;
     }
 
-    public Rarity getRarity()
-    {
+    public Rarity getRarity() {
         return rarity;
     }
 
-    public Color getRarityColor()
-    {
+    public Color getRarityColor() {
         return rarityColor;
     }
 }

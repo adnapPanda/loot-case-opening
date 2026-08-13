@@ -2,8 +2,7 @@ package com.lootcaseopening;
 
 import java.awt.Color;
 
-public enum Rarity
-{
+public enum Rarity {
     COMMON(new Color(75, 105, 255), 80),
     UNCOMMON(new Color(136, 71, 255), 15),
     RARE(new Color(211, 44, 230), 10),
@@ -13,19 +12,16 @@ public enum Rarity
     private final Color color;
     private final int weight;
 
-    Rarity(Color color, int weight)
-    {
+    Rarity(Color color, int weight) {
         this.color = color;
         this.weight = weight;
     }
 
-    public Color getColor()
-    {
+    public Color getColor() {
         return color;
     }
 
-    public int getWeight()
-    {
+    public int getWeight() {
         return weight;
     }
 }

@@ -26,8 +26,7 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-public class LootCaseOpeningOverlay extends Overlay implements KeyListener
-{
+public class LootCaseOpeningOverlay extends Overlay implements KeyListener {
     // Spin panel dimensions
     private static final int VIEWPORT_WIDTH = 620;
     private static final int VIEWPORT_HEIGHT = 130;
@@ -54,16 +53,14 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     private long revealStartTimeNanos;
 
     @Inject
-    public LootCaseOpeningOverlay(Client client, ClientThread clientThread)
-    {
+    public LootCaseOpeningOverlay(Client client, ClientThread clientThread) {
         this.client = client;
         this.clientThread = clientThread;
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ALWAYS_ON_TOP);
     }
 
-    public void open(List<LootItem> pool, LootItem winningItem, Consumer<LootItem> onComplete, Runnable onClose)
-    {
+    public void open(List<LootItem> pool, LootItem winningItem, Consumer<LootItem> onComplete, Runnable onClose) {
         this.animator = new LootCaseAnimator(pool, winningItem);
         this.animator.start();
         this.onComplete = onComplete;
@@ -73,14 +70,12 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         centerPanel(VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
     }
 
-    public void close()
-    {
+    public void close() {
         animator = null;
         revealed = false;
         revealedItem = null;
 
-        if (onClose != null)
-        {
+        if (onClose != null) {
             Runnable callback = onClose;
             onClose = null; // avoid double firing if close() is called again
             callback.run();
@@ -89,10 +84,8 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     }
 
     @Override
-    public Dimension render(Graphics2D graphics)
-    {
-        if (animator == null && !revealed)
-        {
+    public Dimension render(Graphics2D graphics) {
+        if (animator == null && !revealed) {
             return null;
         }
 
@@ -104,8 +97,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         // Center on the game canvas every frame (panel size differs between phases).
         centerPanel(panelWidth, panelHeight);
 
-        if (!revealed)
-        {
+        if (!revealed) {
             animator.update();
 
             drawPanelBackground(graphics, panelWidth, panelHeight);
@@ -113,38 +105,32 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
             drawPointer(graphics);
             drawFadeEdges(graphics);
 
-            if (animator.consumeCompletionEvent())
-            {
+            if (animator.consumeCompletionEvent()) {
                 LootItem winner = getWinningItem();
                 animator = null;
                 revealed = true;
                 revealedItem = winner;
                 revealStartTimeNanos = System.nanoTime();
 
-                if (onComplete != null)
-                {
+                if (onComplete != null) {
                     onComplete.accept(winner);
                 }
             }
-        }
-        else
-        {
+        } else {
             drawRevealPanel(graphics, panelWidth, panelHeight);
         }
 
         return new Dimension(panelWidth, panelHeight);
     }
 
-    private void centerPanel(int panelWidth, int panelHeight)
-    {
+    private void centerPanel(int panelWidth, int panelHeight) {
         int x = (client.getCanvasWidth() - panelWidth) / 2;
         int y = (client.getCanvasHeight() - panelHeight) / 2;
         setPreferredLocation(new Point(x, y));
     }
 
 
-    private LootItem getWinningItem()
-    {
+    private LootItem getWinningItem() {
         List<LootItem> reel = animator.getReel();
         int stride = animator.getSlotStride();
         int index = (int) Math.round(animator.getOffsetPx() / stride);
@@ -152,14 +138,12 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         return reel.get(index);
     }
 
-    private void drawPanelBackground(Graphics2D g, int w, int h)
-    {
+    private void drawPanelBackground(Graphics2D g, int w, int h) {
         g.setColor(new Color(20, 20, 20, 230));
         g.fillRoundRect(0, 0, w, h, 10, 10);
     }
 
-    private void drawReel(Graphics2D g)
-    {
+    private void drawReel(Graphics2D g) {
         double offset = animator.getOffsetPx();
         int stride = animator.getSlotStride();
         int itemWidth = animator.getItemWidth();
@@ -170,12 +154,10 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         Shape oldClip = g.getClip();
         g.setClip(new Area(new Rectangle(4, 4, VIEWPORT_WIDTH - 8, VIEWPORT_HEIGHT - 8)));
 
-        for (int i = 0; i < reel.size(); i++)
-        {
+        for (int i = 0; i < reel.size(); i++) {
             double x = i * stride - offset + VIEWPORT_WIDTH / 2.0 - itemWidth / 2.0;
 
-            if (x + itemWidth < 0 || x > VIEWPORT_WIDTH)
-            {
+            if (x + itemWidth < 0 || x > VIEWPORT_WIDTH) {
                 continue;
             }
 
@@ -186,8 +168,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
             g.setColor(item.getRarityColor());
             g.fillRoundRect(slotX, slotY, itemWidth, ITEM_HEIGHT, 6, 6);
 
-            if (item.getImage() != null)
-            {
+            if (item.getImage() != null) {
                 int imgX = slotX + (itemWidth - item.getImage().getWidth()) / 2;
                 int imgY = slotY + (ITEM_HEIGHT - item.getImage().getHeight()) / 2;
                 g.drawImage(item.getImage(), imgX, imgY, null);
@@ -197,8 +178,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         g.setClip(oldClip);
     }
 
-    private void drawPointer(Graphics2D g)
-    {
+    private void drawPointer(Graphics2D g) {
         int centerX = VIEWPORT_WIDTH / 2;
         g.setColor(Color.WHITE);
         g.setStroke(new BasicStroke(2f));
@@ -209,8 +189,7 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         g.fillPolygon(xs, ys, 3);
     }
 
-    private void drawFadeEdges(Graphics2D g)
-    {
+    private void drawFadeEdges(Graphics2D g) {
         int fadeWidth = 40;
         Color panel = new Color(20, 20, 20);
 
@@ -224,16 +203,14 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
         g.fillRect(VIEWPORT_WIDTH - fadeWidth, 0, fadeWidth, VIEWPORT_HEIGHT);
     }
 
-    private static double easeOutBack(double t)
-    {
+    private static double easeOutBack(double t) {
         double c1 = 1.70158;
         double c3 = c1 + 1;
         double tm1 = t - 1;
         return 1 + c3 * tm1 * tm1 * tm1 + c1 * tm1 * tm1;
     }
 
-    private void drawRevealPanel(Graphics2D g, int w, int h)
-    {
+    private void drawRevealPanel(Graphics2D g, int w, int h) {
         long elapsedMs = (System.nanoTime() - revealStartTimeNanos) / 1_000_000L;
         double t = Math.min(1.0, elapsedMs / (double) REVEAL_ANIM_MS);
         double scale = easeOutBack(t);
@@ -265,11 +242,9 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
 
         // The item itself, scaled up with the pop-in animation
         BufferedImage image = revealedItem.getImage();
-        if (image != null)
-        {
+        if (image != null) {
             int size = (int) Math.round(REVEAL_IMAGE_SIZE * scale);
-            if (size > 0)
-            {
+            if (size > 0) {
                 g.drawImage(image, centerX - size / 2 + IMAGE_X_OFFSET, centerY - size / 2, size, size, null);
             }
         }
@@ -297,39 +272,32 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener
     }
 
     @Override
-    public void keyPressed(KeyEvent e)
-    {
-        if (e.getKeyCode() != KeyEvent.VK_ESCAPE)
-        {
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() != KeyEvent.VK_ESCAPE) {
             return;
         }
 
-        if (!revealed && animator == null)
-        {
+        if (!revealed && animator == null) {
             return;
         }
 
         e.consume();
         clientThread.invoke(() ->
         {
-        if (revealed)
-        {
-            close();
-        }
-        else if (animator != null)
-        {
-            animator.skipToEnd();
-        }});
+            if (revealed) {
+                close();
+            } else if (animator != null) {
+                animator.skipToEnd();
+            }
+        });
 
     }
 
     @Override
-    public void keyReleased(KeyEvent e)
-    {
+    public void keyReleased(KeyEvent e) {
     }
 
     @Override
-    public void keyTyped(KeyEvent e)
-    {
+    public void keyTyped(KeyEvent e) {
     }
 }
