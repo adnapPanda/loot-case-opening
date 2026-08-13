@@ -1,12 +1,9 @@
 package com.lootcaseopening;
 
 import java.awt.*;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import javax.inject.Inject;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
@@ -223,7 +220,7 @@ public class LootCaseOpeningPlugin extends Plugin {
     private void playLegendarySound() {
         try {
             audioPlayer.play(getClass(), LEGENDARY_SOUND_FILE, 0f);
-        } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+        } catch (Exception e) {
             //Do nothing and skip playing sound file
         }
     }
