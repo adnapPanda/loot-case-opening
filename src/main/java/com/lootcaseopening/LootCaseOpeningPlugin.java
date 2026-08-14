@@ -61,34 +61,37 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private static final List<List<LootEntry>> ALL_LOOT_TABLES = Arrays.asList(
             CORRUPTED_GAUNTLET, THEATRE_OF_BLOOD, CHAMBERS_OF_XERIC,
-            TOMBS_OF_AMASCUT, MOONS_OF_PERIL, BARROWS_CHEST
+            TOMBS_OF_AMASCUT, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN
     );
 
-    List<String> lootreceivedObjectNames = Arrays.asList("Corrupted Hunllef", "Crystalline Hunllef", "Theatre of Blood", "Chambers of Xeric", "Tombs of Amascut", "Lunar Chest", "Barrows");
+    List<String> lootreceivedObjectNames = Arrays.asList("Corrupted Hunllef", "Crystalline Hunllef", "Theatre of Blood", "Chambers of Xeric", "Tombs of Amascut", "Lunar Chest", "Barrows",
+            "Hallowed Sepulchre Grand Coffin");
 
-    private static final Set<Integer> CG_MAP_REGION = ImmutableSet.of(11870, 11871, 11872, 12126, 12127, 12128, 12382, 12383, 12384);
-    private static final Set<Integer> MOONS_MAP_REGION = ImmutableSet.of(5780, 5781, 5782, 6036, 6037, 6038, 6292, 6293, 6294);
-    private static final Set<Integer> BARROWS_MAP_REGION = ImmutableSet.of(13974, 13975, 13976, 14230, 14231, 14232, 14486, 14487, 14488);
-    private static final Set<Integer> TOB_MAP_REGION = ImmutableSet.of(12867);
-    private static final Set<Integer> TOA_MAP_REGION = ImmutableSet.of(15184, 15696, 14672);
+    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_OBJECT_NAME = Map.of(
+            "Corrupted Hunllef", CORRUPTED_GAUNTLET,
+            "Crystalline Hunllef", CORRUPTED_GAUNTLET,
+            "Theatre of Blood", THEATRE_OF_BLOOD,
+            "Chambers of Xeric", CHAMBERS_OF_XERIC,
+            "Tombs of Amascut", TOMBS_OF_AMASCUT,
+            "Lunar Chest", MOONS_OF_PERIL,
+            "Barrows", BARROWS_CHEST,
+            "Hallowed Sepulchre Grand Coffin", GRAND_COFFIN
+    );
 
-    private List<LocationCheck> locationCheck;
+    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_ARGS = Map.of(
+            "cg", CORRUPTED_GAUNTLET,
+            "moons", MOONS_OF_PERIL,
+            "barrows", BARROWS_CHEST,
+            "cox", CHAMBERS_OF_XERIC,
+            "tob", THEATRE_OF_BLOOD,
+            "toa", TOMBS_OF_AMASCUT,
+            "sepulchre", GRAND_COFFIN
+    );
 
     @Override
     protected void startUp() {
         overlayManager.add(caseOpeningOverlay);
         keyManager.registerKeyListener(caseOpeningOverlay);
-
-        //Construct LocationCheck class to verify that client is in specific region when onLootReceived event is called
-        locationCheck = Arrays.asList(
-                new LocationCheck(CORRUPTED_GAUNTLET, () -> checkInRegion(CG_MAP_REGION)),
-                new LocationCheck(MOONS_OF_PERIL, () -> checkInRegion(MOONS_MAP_REGION)),
-                new LocationCheck(BARROWS_CHEST, () -> checkInRegion(BARROWS_MAP_REGION)),
-                new LocationCheck(CHAMBERS_OF_XERIC, () -> client.getVarbitValue(VarbitID.RAIDS_CLIENT_INDUNGEON) == 1),
-                new LocationCheck(THEATRE_OF_BLOOD, () -> checkInRegion(TOB_MAP_REGION)),
-                new LocationCheck(TOMBS_OF_AMASCUT, () -> checkInRegion(TOA_MAP_REGION))
-        );
-
     }
 
     @Override
@@ -101,11 +104,22 @@ public class LootCaseOpeningPlugin extends Plugin {
     public void onCommandExecuted(CommandExecuted commandExecuted) {
         if (commandExecuted.getCommand().equalsIgnoreCase("opencase")) {
             Random r = new Random();
-            List<LootEntry> table = ALL_LOOT_TABLES.get(r.nextInt(ALL_LOOT_TABLES.size()));
+            List<LootEntry> table = getTableLootEntry(commandExecuted.getArguments(), r);
             LootEntry entry = table.get(r.nextInt(table.size()));
             openCase(table, entry.getItemId(), interfaceIDFor(table));
         }
     }
+
+    private List<LootEntry> getTableLootEntry(String[] args, Random r) {
+        if (args.length > 0) {
+            List<LootEntry> lootEntry = LOOT_TABLE_BY_ARGS.get(args[0].toLowerCase());
+            if (lootEntry != null) {
+                return lootEntry;
+            }
+        }
+        return ALL_LOOT_TABLES.get(r.nextInt(ALL_LOOT_TABLES.size()));
+    }
+
 
     private Integer interfaceIDFor(List<LootEntry> lootTable) {
         if (lootTable == BARROWS_CHEST) {
@@ -162,13 +176,10 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     @Subscribe
     public void onLootReceived(LootReceived lootReceived) {
-        if (!lootreceivedObjectNames.contains(lootReceived.getName())) return;
+        List<LootEntry> lootTable = LOOT_TABLE_BY_OBJECT_NAME.get(lootReceived.getName());
 
-        for (LocationCheck check : locationCheck) {
-            if (check.isActive()) {
-                openCaseForTable(lootReceived, check.getLootTable());
-            }
-        }
+        if (lootTable == null) return;
+        openCaseForTable(lootReceived, lootTable);
     }
 
     private void openCaseForTable(LootReceived lootReceived, List<LootEntry> lootTable) {
@@ -180,23 +191,6 @@ public class LootCaseOpeningPlugin extends Plugin {
                 }
             }
         }
-    }
-
-    private boolean checkInRegion(Set<Integer> mapRegion) {
-        GameState gameState = client.getGameState();
-        if (gameState != GameState.LOGGED_IN && gameState != GameState.LOADING) {
-            return false;
-        }
-
-        int[] currentMapRegions = client.getTopLevelWorldView().getMapRegions();
-
-        for (int region : currentMapRegions) {
-            if (!mapRegion.contains(region)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public void openCase(List<LootEntry> lootTable, int wonItemId, Integer widgetComponentID) {

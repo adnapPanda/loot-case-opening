@@ -77,35 +77,47 @@ public final class LootTables {
 
     public static final List<LootEntry> BARROWS_CHEST = List.of(
             new LootEntry(ItemID.BARROWS_AHRIM_BODY, Rarity.LEGENDARY),
-            new LootEntry(ItemID.BARROWS_AHRIM_HEAD, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_KARIL_LEGS, Rarity.LEGENDARY),
+            new LootEntry(ItemID.BARROWS_KARIL_BODY, Rarity.LEGENDARY),
             new LootEntry(ItemID.BARROWS_AHRIM_LEGS, Rarity.LEGENDARY),
-            new LootEntry(ItemID.BARROWS_AHRIM_WEAPON, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_DHAROK_BODY, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_DHAROK_HEAD, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_DHAROK_LEGS, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_DHAROK_WEAPON, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_GUTHAN_BODY, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_GUTHAN_HEAD, Rarity.ULTRA_RARE),
-            new LootEntry(ItemID.BARROWS_GUTHAN_LEGS, Rarity.RARE),
-            new LootEntry(ItemID.BARROWS_GUTHAN_WEAPON, Rarity.RARE),
-            new LootEntry(ItemID.BARROWS_KARIL_BODY, Rarity.LEGENDARY),
-            new LootEntry(ItemID.BARROWS_KARIL_HEAD, Rarity.RARE),
-            new LootEntry(ItemID.BARROWS_KARIL_LEGS, Rarity.LEGENDARY),
-            new LootEntry(ItemID.BARROWS_KARIL_WEAPON, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_TORAG_BODY, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_TORAG_HEAD, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BARROWS_TORAG_LEGS, Rarity.ULTRA_RARE),
+            new LootEntry(ItemID.BARROWS_GUTHAN_LEGS, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_GUTHAN_WEAPON, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_KARIL_HEAD, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_KARIL_WEAPON, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_AHRIM_HEAD, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_TORAG_WEAPON, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_BODY, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_HEAD, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_LEGS, Rarity.RARE),
             new LootEntry(ItemID.BARROWS_VERAC_WEAPON, Rarity.RARE),
+            new LootEntry(ItemID.BARROWS_AHRIM_WEAPON, Rarity.RARE),
             new LootEntry(ItemID.DRAGON_MED_HELM, Rarity.UNCOMMON),
             new LootEntry(ItemID.BLOODRUNE, Rarity.COMMON),
             new LootEntry(ItemID.DEATHRUNE, Rarity.COMMON),
             new LootEntry(ItemID.CHAOSRUNE, Rarity.COMMON),
             new LootEntry(ItemID.MINDRUNE, Rarity.COMMON),
             new LootEntry(ItemID.COINS, Rarity.COMMON)
+    );
+
+    public static final List<LootEntry> GRAND_COFFIN = List.of(
+            new LootEntry(ItemID.RING_OF_ENDURANCE_UNCHARGED, Rarity.LEGENDARY),
+            //Add both rings since I am unsure which ItemID will be returned
+            new LootEntry(ItemID.RING_OF_ENDURANCE, Rarity.LEGENDARY),
+            new LootEntry(ItemID.STRANGE_OLD_LOCKPICK_FULL, Rarity.ULTRA_RARE),
+            new LootEntry(ItemID.SANFEW_SALVE_4_DOSE, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RANARR_SEED, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_2H_SWORD, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_PLATEBODY, Rarity.UNCOMMON),
+            new LootEntry(ItemID.HALLOWED_MARK, Rarity.COMMON)
     );
 
     private LootTables() {

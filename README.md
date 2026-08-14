@@ -3,7 +3,7 @@
 Adds a case-opening-style reel animation that plays when you receive loot from supported content. Instead of the item just appearing in your inventory, a reel spins across a row of possible items before landing on the one you actually got.
 
 Behavior differs slightly by content:
-- **Corrupted Gauntlet, Barrows, and Moons of Peril** spin on every completion, including common loot
+- **Corrupted Gauntlet, Barrows, Moons of Peril, and Hallowed Sepulchre** spin on every completion, including common loot
 - **Theatre of Blood, Chambers of Xeric, and Tombs of Amascut** only spin when you receive a unique drop
 
 In Raids the game already shows you that there is a unique by recoloring the chest, hence the plugin only spins for unique loot.
@@ -15,6 +15,7 @@ In Raids the game already shows you that there is a unique by recoloring the che
 - Corrupted Gauntlet/Gauntlet
 - Moons of Peril
 - Barrows
+- Hallowed Sepulchre (Floor 5)
 
 ### How it works
 - Triggers automatically based on the rules above
