@@ -76,4 +76,37 @@ public interface LootCaseOpeningConfig extends Config
 	{
 		return Rarity.LEGENDARY.getColor();
 	}
+
+	@ConfigItem(
+			keyName = "playLegendaryJingle",
+			name = "Jingle plays for legendary reward",
+			description = "Decides whether a jingle is played when the spin lands on a legendary item",
+			position = 6
+	)
+	default boolean playLegendaryJingle()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+			keyName = "showWheelSpinInWilderness",
+			name = "Enable wheel spin in wilderness",
+			description = "Show the wheel spin animation for Larran's and Zombie Pirate Chests",
+			position = 7
+	)
+	default boolean showWheelSpinInWilderness()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+			keyName = "showWheelSpinForKeyChests",
+			name = "Enable wheel spin for spammable chests",
+			description = "Enables the wheel spin animation for chests that can be spam opened. (Ex: Elven crystal chest, Moon chest)",
+			position = 8
+	)
+	default boolean showWheelSpinForKeyChests()
+	{
+		return true;
+	}
 }

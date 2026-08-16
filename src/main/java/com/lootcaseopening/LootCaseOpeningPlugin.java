@@ -5,17 +5,13 @@ import java.util.*;
 import java.util.List;
 import javax.inject.Inject;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.inject.Provides;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
-import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -50,22 +46,19 @@ public class LootCaseOpeningPlugin extends Plugin {
     @Inject
     private KeyManager keyManager;
 
-    @Inject
-    private AudioPlayer audioPlayer;
-
-    //TODO: Placeholder
-    private static final String LEGENDARY_SOUND_FILE = "legendary.wav";
-
     private Widget hiddenRewardWidget;
     private Integer hideComponentID;
 
+
     private static final List<List<LootEntry>> ALL_LOOT_TABLES = Arrays.asList(
             CORRUPTED_GAUNTLET, THEATRE_OF_BLOOD, CHAMBERS_OF_XERIC,
-            TOMBS_OF_AMASCUT, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN
+            TOMBS_OF_AMASCUT, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN, ELVEN_CRYSTAL_CHEST, MOON_CHEST
     );
 
+    private static final List<List<LootEntry>> SPAMMABLE_CHESTS = Arrays.asList(ELVEN_CRYSTAL_CHEST, MOON_CHEST);
+
     List<String> lootreceivedObjectNames = Arrays.asList("Corrupted Hunllef", "Crystalline Hunllef", "Theatre of Blood", "Chambers of Xeric", "Tombs of Amascut", "Lunar Chest", "Barrows",
-            "Hallowed Sepulchre Grand Coffin");
+            "Hallowed Sepulchre Grand Coffin", "Elven Crystal Chest", "Chest (Moon key)");
 
     private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_OBJECT_NAME = Map.of(
             "Corrupted Hunllef", CORRUPTED_GAUNTLET,
@@ -75,7 +68,9 @@ public class LootCaseOpeningPlugin extends Plugin {
             "Tombs of Amascut", TOMBS_OF_AMASCUT,
             "Lunar Chest", MOONS_OF_PERIL,
             "Barrows", BARROWS_CHEST,
-            "Hallowed Sepulchre Grand Coffin", GRAND_COFFIN
+            "Hallowed Sepulchre Grand Coffin", GRAND_COFFIN,
+            "Elven Crystal Chest", ELVEN_CRYSTAL_CHEST,
+            "Chest (Moon key)", MOON_CHEST
     );
 
     private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_ARGS = Map.of(
@@ -85,7 +80,9 @@ public class LootCaseOpeningPlugin extends Plugin {
             "cox", CHAMBERS_OF_XERIC,
             "tob", THEATRE_OF_BLOOD,
             "toa", TOMBS_OF_AMASCUT,
-            "sepulchre", GRAND_COFFIN
+            "sepulchre", GRAND_COFFIN,
+            "crystal", ELVEN_CRYSTAL_CHEST,
+            "moon", MOON_CHEST
     );
 
     @Override
@@ -144,15 +141,12 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded widgetLoaded) {
-        if (hideComponentID == null) {
-            return;
+        if (hideComponentID != null) {
+            int pendingGroupId = WidgetUtil.componentToInterface(hideComponentID);
+            if (widgetLoaded.getGroupId() == pendingGroupId) {
+                hideRewardWidget(hideComponentID);
+            }
         }
-
-        int pendingGroupId = WidgetUtil.componentToInterface(hideComponentID);
-        if (widgetLoaded.getGroupId() == pendingGroupId) {
-            hideRewardWidget(hideComponentID);
-        }
-
     }
 
     private void hideRewardWidget(int componentID) {
@@ -176,6 +170,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     @Subscribe
     public void onLootReceived(LootReceived lootReceived) {
+        System.out.println(lootReceived.getName());
         List<LootEntry> lootTable = LOOT_TABLE_BY_OBJECT_NAME.get(lootReceived.getName());
 
         if (lootTable == null) return;
@@ -194,6 +189,9 @@ public class LootCaseOpeningPlugin extends Plugin {
     }
 
     public void openCase(List<LootEntry> lootTable, int wonItemId, Integer widgetComponentID) {
+        //Skip roll for spammable chests if config item is disabled
+        if (SPAMMABLE_CHESTS.contains(lootTable) && !config.showWheelSpinForKeyChests()) return;
+
         List<LootItem> pool = buildItemPool(lootTable);
         LootItem winner = resolveWinner(pool, wonItemId);
 
@@ -204,8 +202,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
         caseOpeningOverlay.open(pool, winner, result ->
                 {
-                    // TODO: skip playing sound for now
-//			if (result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
+			        if (config.playLegendaryJingle() && result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
                 },
                 this::unhideRewardWidget
         );
@@ -213,7 +210,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private void playLegendarySound() {
         try {
-            audioPlayer.play(getClass(), LEGENDARY_SOUND_FILE, 0f);
+            client.playSoundEffect(6765, 64);
         } catch (Exception e) {
             //Do nothing and skip playing sound file
         }

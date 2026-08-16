@@ -120,6 +120,46 @@ public final class LootTables {
             new LootEntry(ItemID.HALLOWED_MARK, Rarity.COMMON)
     );
 
+    public static final List<LootEntry> ELVEN_CRYSTAL_CHEST = List.of(
+            new LootEntry(ItemID.UNCUT_ONYX, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONSTONE_HELMET, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONSTONE_GAUNTLETS, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONSTONE_PLATEBODY, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONSTONE_ARMOURED_BOOTS, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONSTONE_PLATELEGS, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGON_PLATELEGS, Rarity.RARE),
+            new LootEntry(ItemID.DRAGON_PLATESKIRT, Rarity.RARE),
+            new LootEntry(ItemID.DRAGONSHIELD_A, Rarity.RARE),
+            new LootEntry(ItemID.CRYSTAL_TREE_SEED, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNITE_ORE, Rarity.UNCOMMON),
+            new LootEntry(ItemID.GOLD_ORE, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RAW_SHARK, Rarity.UNCOMMON),
+            new LootEntry(ItemID.PRIF_CRYSTAL_SHARD, Rarity.COMMON),
+            new LootEntry(ItemID.CRYSTAL_KEY, Rarity.COMMON),
+            new LootEntry(ItemID.UNCUT_DRAGONSTONE, Rarity.COMMON)
+    );
+
+    public static final List<LootEntry> MOON_CHEST = List.of(
+            new LootEntry(ItemID.MOON_HELMET, Rarity.LEGENDARY),
+            new LootEntry(ItemID.UNCUT_ONYX, Rarity.LEGENDARY),
+            new LootEntry(ItemID.VARLAMORE_KEY, Rarity.RARE),
+            new LootEntry(ItemID.XBOWS_CROSSBOW_BOLTS_RUNITE_TIPPED_ONYX, Rarity.RARE),
+            new LootEntry(ItemID.HUASCA_SEED, Rarity.UNCOMMON),
+            new LootEntry(ItemID.DRAGON_PLATELEGS, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_PLATEBODY, Rarity.UNCOMMON),
+            new LootEntry(ItemID.SPINACH_ROLL, Rarity.COMMON),
+            new LootEntry(ItemID.CRYSTAL_KEY, Rarity.COMMON),
+            new LootEntry(ItemID.CABBAGE, Rarity.COMMON),
+            new LootEntry(ItemID.COAL, Rarity.COMMON),
+            new LootEntry(ItemID.GOLD_ORE, Rarity.COMMON),
+            new LootEntry(ItemID.UNCUT_DIAMOND, Rarity.COMMON),
+            new LootEntry(ItemID.RAW_MONKFISH, Rarity.COMMON),
+            new LootEntry(ItemID.SUN_KISSED_BONE, Rarity.COMMON),
+            new LootEntry(ItemID.WATERMELON_SEED, Rarity.COMMON),
+            new LootEntry(ItemID.NATURERUNE, Rarity.COMMON),
+            new LootEntry(ItemID.SUNFIRESPLINTER, Rarity.COMMON)
+    );
+
     private LootTables() {
     }
 }
