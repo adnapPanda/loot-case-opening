@@ -44,11 +44,11 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener {
     private final Client client;
     private final ClientThread clientThread;
 
-    private LootCaseAnimator animator;
+    private volatile LootCaseAnimator animator;
     private Consumer<LootItem> onComplete;
     private Runnable onClose;
 
-    private boolean revealed = false;
+    private volatile boolean revealed = false;
     private LootItem revealedItem;
     private long revealStartTimeNanos;
 
@@ -81,6 +81,9 @@ public class LootCaseOpeningOverlay extends Overlay implements KeyListener {
             callback.run();
         }
 
+    }
+    public boolean isActive() {
+        return animator != null || revealed;
     }
 
     @Override

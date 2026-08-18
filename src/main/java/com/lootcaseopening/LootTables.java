@@ -48,6 +48,13 @@ public final class LootTables {
             new LootEntry(ItemID.TUMEKENS_SHADOW_UNCHARGED, Rarity.LEGENDARY)
     );
 
+    public static final List<LootEntry> DOOM = List.of(
+            new LootEntry(ItemID.AVERNIC_TREADS, Rarity.LEGENDARY),
+            new LootEntry(ItemID.EYE_OF_AYAK_UNCHARGED, Rarity.ULTRA_RARE),
+            new LootEntry(ItemID.MOKHAIOTL_CLOTH, Rarity.ULTRA_RARE),
+            new LootEntry(ItemID.DOMPET, Rarity.RARE)
+    );
+
     public static final List<LootEntry> MOONS_OF_PERIL = List.of(
             new LootEntry(ItemID.BLOOD_MOON_CHESTPLATE, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.BLOOD_MOON_HELM, Rarity.ULTRA_RARE),
@@ -158,6 +165,71 @@ public final class LootTables {
             new LootEntry(ItemID.WATERMELON_SEED, Rarity.COMMON),
             new LootEntry(ItemID.NATURERUNE, Rarity.COMMON),
             new LootEntry(ItemID.SUNFIRESPLINTER, Rarity.COMMON)
+    );
+
+    public static final List<LootEntry> LARRANS_BIG_CHEST = List.of(
+            new LootEntry(ItemID.DAGONHAI_HAT, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DAGONHAI_ROBE_BOTTOM, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DAGONHAI_ROBE_TOP, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGONFRUIT_TREE_SEED, Rarity.RARE),
+            new LootEntry(ItemID.MAGIC_TREE_SEED, Rarity.RARE),
+            new LootEntry(ItemID.SNAPDRAGON_SEED, Rarity.RARE),
+            new LootEntry(ItemID.RANARR_SEED, Rarity.RARE),
+            new LootEntry(ItemID.TORSTOL_SEED, Rarity.RARE),
+            new LootEntry(ItemID.CELASTRUS_TREE_SEED, Rarity.RARE),
+            new LootEntry(ItemID.PALM_TREE_SEED, Rarity.RARE),
+            new LootEntry(ItemID.DRAGON_DART_TIP, Rarity.RARE),
+            new LootEntry(ItemID.RUNITE_ORE, Rarity.RARE),
+            new LootEntry(ItemID.MAGIC_LOGS, Rarity.RARE),
+            new LootEntry(ItemID.STEEL_BAR, Rarity.RARE),
+            new LootEntry(ItemID.DRAGON_ARROWHEADS, Rarity.RARE),
+            new LootEntry(ItemID.RAW_MANTARAY, Rarity.RARE),
+            new LootEntry(ItemID.RAW_SEATURTLE, Rarity.RARE),
+            new LootEntry(ItemID.RAW_SHARK, Rarity.RARE),
+            new LootEntry(ItemID.SHARK_LURE, Rarity.RARE),
+            new LootEntry(ItemID.REDWOOD_TREE_SEED, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_FULL_HELM, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_PLATEBODY, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_PLATELEGS, Rarity.UNCOMMON),
+            new LootEntry(ItemID.COINS, Rarity.UNCOMMON),
+            new LootEntry(ItemID.UNCUT_DIAMOND, Rarity.UNCOMMON),
+            new LootEntry(ItemID.UNCUT_RUBY, Rarity.COMMON),
+            new LootEntry(ItemID.COAL, Rarity.COMMON),
+            new LootEntry(ItemID.GOLD_ORE, Rarity.COMMON),
+            new LootEntry(ItemID.IRON_ORE, Rarity.COMMON),
+            new LootEntry(ItemID.BLANKRUNE_HIGH, Rarity.COMMON),
+            new LootEntry(ItemID.RAW_TUNA, Rarity.COMMON),
+            new LootEntry(ItemID.RAW_LOBSTER, Rarity.COMMON),
+            new LootEntry(ItemID.RAW_SWORDFISH, Rarity.COMMON),
+            new LootEntry(ItemID.RAW_MONKFISH, Rarity.COMMON)
+    );
+
+    public static final List<LootEntry> ZOMBIE_PIRATES_LOCKER = List.of(
+            new LootEntry(ItemID.WILDERNESS_BLIP_BLOCKING_SCROLL, Rarity.LEGENDARY),
+            new LootEntry(ItemID.DRAGON_SCIMITAR, Rarity.RARE),
+            new LootEntry(ItemID.DRAGON_LONGSWORD, Rarity.RARE),
+            new LootEntry(ItemID.DRAGON_DAGGER, Rarity.RARE),
+            new LootEntry(ItemID.MCANNONBALL, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_LONGSWORD, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_BATTLEAXE, Rarity.UNCOMMON),
+            new LootEntry(ItemID.RUNE_WARHAMMER, Rarity.UNCOMMON),
+            new LootEntry(ItemID.BLOODRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.DEATHRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.CHAOSRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.MINDRUNE, Rarity.COMMON),
+            new LootEntry(ItemID.BATTLESTAFF, Rarity.COMMON),
+            new LootEntry(ItemID.ADAMANT_PLATEBODY, Rarity.COMMON),
+            new LootEntry(ItemID.RUNE_MED_HELM, Rarity.COMMON),
+            new LootEntry(ItemID.RUNE_SWORD, Rarity.COMMON),
+            new LootEntry(ItemID.RUNE_MACE, Rarity.COMMON),
+            new LootEntry(ItemID.BLIGHTED_SACK_ICEBARRAGE, Rarity.COMMON),
+            new LootEntry(ItemID.BLIGHTED_ANGLERFISH, Rarity.COMMON),
+            new LootEntry(ItemID.BLIGHTED_MANTARAY, Rarity.COMMON),
+            new LootEntry(ItemID.BLIGHTED_KARAMBWAN, Rarity.COMMON),
+            new LootEntry(ItemID.BLIGHTED_4DOSE2RESTORE, Rarity.COMMON),
+            new LootEntry(ItemID.COINS, Rarity.COMMON),
+            new LootEntry(ItemID.GOLD_ORE, Rarity.COMMON),
+            new LootEntry(ItemID.ADAMANT_SEED, Rarity.COMMON)
     );
 
     private LootTables() {

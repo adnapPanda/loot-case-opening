@@ -8,10 +8,12 @@ import javax.inject.Inject;
 import com.google.inject.Provides;
 import net.runelite.api.Client;
 import net.runelite.api.events.CommandExecuted;
+import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -23,6 +25,7 @@ import net.runelite.client.plugins.loottracker.LootReceived;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 import static com.lootcaseopening.LootTables.*;
+import static java.util.Map.entry;
 
 @PluginDescriptor(
         name = "Loot Case Opening"
@@ -46,43 +49,51 @@ public class LootCaseOpeningPlugin extends Plugin {
     @Inject
     private KeyManager keyManager;
 
+    @Inject
+    private ClientThread clientThread;
+
     private Widget hiddenRewardWidget;
     private Integer hideComponentID;
+
+    private final Set<Integer> processedDoomItemIds = new HashSet<>();
 
 
     private static final List<List<LootEntry>> ALL_LOOT_TABLES = Arrays.asList(
             CORRUPTED_GAUNTLET, THEATRE_OF_BLOOD, CHAMBERS_OF_XERIC,
-            TOMBS_OF_AMASCUT, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN, ELVEN_CRYSTAL_CHEST, MOON_CHEST
+            TOMBS_OF_AMASCUT, DOOM, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN, ELVEN_CRYSTAL_CHEST, MOON_CHEST, LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER
     );
 
-    private static final List<List<LootEntry>> SPAMMABLE_CHESTS = Arrays.asList(ELVEN_CRYSTAL_CHEST, MOON_CHEST);
+    private static final List<List<LootEntry>> SPAMMABLE_CHESTS = Arrays.asList(ELVEN_CRYSTAL_CHEST, MOON_CHEST, LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER);
+    private static final List<List<LootEntry>> WILDERNESS_CHESTS = Arrays.asList(LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER);
 
-    List<String> lootreceivedObjectNames = Arrays.asList("Corrupted Hunllef", "Crystalline Hunllef", "Theatre of Blood", "Chambers of Xeric", "Tombs of Amascut", "Lunar Chest", "Barrows",
-            "Hallowed Sepulchre Grand Coffin", "Elven Crystal Chest", "Chest (Moon key)");
-
-    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_OBJECT_NAME = Map.of(
-            "Corrupted Hunllef", CORRUPTED_GAUNTLET,
-            "Crystalline Hunllef", CORRUPTED_GAUNTLET,
-            "Theatre of Blood", THEATRE_OF_BLOOD,
-            "Chambers of Xeric", CHAMBERS_OF_XERIC,
-            "Tombs of Amascut", TOMBS_OF_AMASCUT,
-            "Lunar Chest", MOONS_OF_PERIL,
-            "Barrows", BARROWS_CHEST,
-            "Hallowed Sepulchre Grand Coffin", GRAND_COFFIN,
-            "Elven Crystal Chest", ELVEN_CRYSTAL_CHEST,
-            "Chest (Moon key)", MOON_CHEST
+    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_OBJECT_NAME = Map.ofEntries(
+            entry("Corrupted Hunllef", CORRUPTED_GAUNTLET),
+            entry("Crystalline Hunllef", CORRUPTED_GAUNTLET),
+            entry("Theatre of Blood", THEATRE_OF_BLOOD),
+            entry("Chambers of Xeric", CHAMBERS_OF_XERIC),
+            entry("Tombs of Amascut", TOMBS_OF_AMASCUT),
+            entry("Lunar Chest", MOONS_OF_PERIL),
+            entry("Barrows", BARROWS_CHEST),
+            entry("Hallowed Sepulchre Grand Coffin", GRAND_COFFIN),
+            entry("Elven Crystal Chest", ELVEN_CRYSTAL_CHEST),
+            entry("Chest (Moon key)", MOON_CHEST),
+            entry("Larran's big chest", LARRANS_BIG_CHEST),
+            entry("Zombie Pirate's Locker", ZOMBIE_PIRATES_LOCKER)
     );
 
-    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_ARGS = Map.of(
-            "cg", CORRUPTED_GAUNTLET,
-            "moons", MOONS_OF_PERIL,
-            "barrows", BARROWS_CHEST,
-            "cox", CHAMBERS_OF_XERIC,
-            "tob", THEATRE_OF_BLOOD,
-            "toa", TOMBS_OF_AMASCUT,
-            "sepulchre", GRAND_COFFIN,
-            "crystal", ELVEN_CRYSTAL_CHEST,
-            "moon", MOON_CHEST
+    private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_ARGS = Map.ofEntries(
+            entry("cg", CORRUPTED_GAUNTLET),
+            entry("moons", MOONS_OF_PERIL),
+            entry("barrows", BARROWS_CHEST),
+            entry("cox", CHAMBERS_OF_XERIC),
+            entry("tob", THEATRE_OF_BLOOD),
+            entry("toa", TOMBS_OF_AMASCUT),
+            entry("doom", DOOM),
+            entry("sepulchre", GRAND_COFFIN),
+            entry("crystal", ELVEN_CRYSTAL_CHEST),
+            entry("moon", MOON_CHEST),
+            entry("larrans", LARRANS_BIG_CHEST),
+            entry("zombie", ZOMBIE_PIRATES_LOCKER)
     );
 
     @Override
@@ -134,10 +145,11 @@ public class LootCaseOpeningPlugin extends Plugin {
         if (lootTable == TOMBS_OF_AMASCUT) {
             return InterfaceID.ToaChests.UNIVERSE;
         }
-        //CG has no widget
+        if (lootTable == DOOM) {
+            return InterfaceID.DomEndLevelUi.UNIVERSE;
+        }
         return null;
     }
-
 
     @Subscribe
     public void onWidgetLoaded(WidgetLoaded widgetLoaded) {
@@ -147,7 +159,57 @@ public class LootCaseOpeningPlugin extends Plugin {
                 hideRewardWidget(hideComponentID);
             }
         }
+
+        if (widgetLoaded.getGroupId() == WidgetUtil.componentToInterface(InterfaceID.DomEndLevelUi.UNIVERSE)) {
+            hideRewardWidget(InterfaceID.DomEndLevelUi.UNIVERSE);
+            //Delay because loot isn't loaded into widget yet
+            clientThread.invokeLater(this::checkDoomLoot);
+        }
     }
+
+    @Subscribe
+    public void onMenuOptionClicked(MenuOptionClicked event) {
+        Widget widget = event.getWidget();
+        if (widget != null && widget.getId() == InterfaceID.DomEndLevelUi.BTN_LEAVE) {
+            //clear when player leaves doom by claiming loot
+            processedDoomItemIds.clear();
+        }
+    }
+
+    private void checkDoomLoot() {
+        if (caseOpeningOverlay.isActive()) {
+            return;
+        }
+
+        Widget lootContents = client.getWidget(InterfaceID.DomEndLevelUi.LOOT_CONTENTS);
+        if (lootContents == null || lootContents.getChildren() == null) {
+            unhideRewardWidget();
+            return;
+        }
+
+        Widget[] children = lootContents.getChildren();
+
+        for (Widget itemWidget : children) {
+            int itemId = itemWidget.getItemId();
+            if (itemId <= 0) {
+                continue;
+            }
+
+            int normalizedID = itemManager.canonicalize(itemId);
+            if (!processedDoomItemIds.add(normalizedID)) {
+                continue;
+            }
+
+            for (LootEntry entry : DOOM) {
+                if (entry.getItemId() == normalizedID) {
+                    openCase(DOOM, entry.getItemId(), interfaceIDFor(DOOM));
+                    return;
+                }
+            }
+        }
+        unhideRewardWidget();
+    }
+
 
     private void hideRewardWidget(int componentID) {
         Widget widget = client.getWidget(componentID);
@@ -170,9 +232,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     @Subscribe
     public void onLootReceived(LootReceived lootReceived) {
-        System.out.println(lootReceived.getName());
         List<LootEntry> lootTable = LOOT_TABLE_BY_OBJECT_NAME.get(lootReceived.getName());
-
         if (lootTable == null) return;
         openCaseForTable(lootReceived, lootTable);
     }
@@ -180,7 +240,8 @@ public class LootCaseOpeningPlugin extends Plugin {
     private void openCaseForTable(LootReceived lootReceived, List<LootEntry> lootTable) {
         for (LootEntry entry : lootTable) {
             for (ItemStack item : lootReceived.getItems()) {
-                if (entry.getItemId() == item.getId()) {
+                int normalizedID = itemManager.canonicalize(item.getId());
+                if (entry.getItemId() == normalizedID) {
                     openCase(lootTable, entry.getItemId(), interfaceIDFor(lootTable));
                     return;
                 }
@@ -191,7 +252,8 @@ public class LootCaseOpeningPlugin extends Plugin {
     public void openCase(List<LootEntry> lootTable, int wonItemId, Integer widgetComponentID) {
         //Skip roll for spammable chests if config item is disabled
         if (SPAMMABLE_CHESTS.contains(lootTable) && !config.showWheelSpinForKeyChests()) return;
-
+        //Skip roll for wildy chests if config is disabled
+        if (WILDERNESS_CHESTS.contains(lootTable) && !config.showWheelSpinInWilderness()) return;
         List<LootItem> pool = buildItemPool(lootTable);
         LootItem winner = resolveWinner(pool, wonItemId);
 
@@ -202,7 +264,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
         caseOpeningOverlay.open(pool, winner, result ->
                 {
-			        if (config.playLegendaryJingle() && result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
+                    if (config.playLegendaryJingle() && result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
                 },
                 this::unhideRewardWidget
         );
