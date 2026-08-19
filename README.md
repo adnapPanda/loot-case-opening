@@ -33,3 +33,6 @@ In some content the game already shows you that there is a unique by recoloring 
 
 <img width="800" height="494" alt="barrows-unique" src="https://github.com/user-attachments/assets/62f285db-994c-4fc0-98b8-804c0f2bb4c5" />
 
+
+### Available config options
+<img width="294" height="537" alt="image" src="https://github.com/user-attachments/assets/03ed5642-5f15-4375-a6e7-d6f044fb74ec" />
