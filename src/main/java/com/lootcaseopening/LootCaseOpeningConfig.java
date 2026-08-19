@@ -1,9 +1,6 @@
 package com.lootcaseopening;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.*;
 
 import java.awt.*;
 
@@ -77,22 +74,44 @@ public interface LootCaseOpeningConfig extends Config
 		return Rarity.LEGENDARY.getColor();
 	}
 
+	@ConfigSection(
+			name = "Sound Effect Settings",
+			description = "Settings for sound effects",
+			position = 6
+	)
+	String soundEffect = "Sound Effect Settings";
 	@ConfigItem(
 			keyName = "playLegendaryJingle",
 			name = "Jingle plays for legendary reward",
 			description = "Decides whether a jingle is played when the spin lands on a legendary item",
-			position = 6
+			section = soundEffect,
+			position = 7
 	)
 	default boolean playLegendaryJingle()
 	{
 		return true;
 	}
 
+	@Range(
+			max = 200
+	)
+	@ConfigItem(
+			keyName = "legendaryJingleVolume",
+			name = "Jingle Volume",
+			description = "Adjust how loud the legendary jingle is played",
+			section = soundEffect,
+			position = 8
+	)
+	default int legendaryJingleVolume()
+	{
+		return 32;
+	}
+
 	@ConfigItem(
 			keyName = "showWheelSpinInWilderness",
 			name = "Enable wheel spin in wilderness",
 			description = "Show the wheel spin animation for Larran's and Zombie Pirate Chests",
-			position = 7
+			position = 9
 	)
 	default boolean showWheelSpinInWilderness()
 	{
@@ -103,7 +122,7 @@ public interface LootCaseOpeningConfig extends Config
 			keyName = "showWheelSpinForKeyChests",
 			name = "Enable wheel spin for spammable chests",
 			description = "Enables the wheel spin animation for chests that can be spam opened. (Ex: Elven crystal chest, Moon chest)",
-			position = 8
+			position = 10
 	)
 	default boolean showWheelSpinForKeyChests()
 	{

@@ -272,7 +272,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private void playLegendarySound() {
         try {
-            client.playSoundEffect(6765, 64);
+            client.playSoundEffect(6765, config.legendaryJingleVolume());
         } catch (Exception e) {
             //Do nothing and skip playing sound file
         }
