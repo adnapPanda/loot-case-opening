@@ -35,4 +35,4 @@ In some content the game already shows you that there is a unique by recoloring 
 
 
 ### Available config options
-<img width="294" height="537" alt="image" src="https://github.com/user-attachments/assets/03ed5642-5f15-4375-a6e7-d6f044fb74ec" />
+<img width="299" height="687" alt="image" src="https://github.com/user-attachments/assets/f3a4ae24-9a9c-4fc8-9fac-ec32728e92b6" />
