@@ -7,10 +7,12 @@ import javax.inject.Inject;
 
 import com.google.inject.Provides;
 import net.runelite.api.Client;
+import net.runelite.api.VarClientInt;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.callback.ClientThread;
@@ -54,6 +56,10 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private Widget hiddenRewardWidget;
     private Integer hideComponentID;
+
+    private Widget hiddenChatWidget;
+    private Widget hiddenCollectionLogWidget;
+    private Widget hiddenInvWidget;
 
     private final Set<Integer> processedDoomItemIds = new HashSet<>();
 
@@ -229,6 +235,60 @@ public class LootCaseOpeningPlugin extends Plugin {
         hideComponentID = null;
     }
 
+    private void hideChat() {
+        if (!config.hideChat()) {
+            return;
+        }
+
+        Widget widget = client.getWidget(InterfaceID.Chatbox.UNIVERSE);
+        if (widget == null) {
+            return;
+        }
+        widget.setHidden(true);
+        hiddenChatWidget = widget;
+    }
+
+    private void hideCollectionLogPopup() {
+        if (!config.hideCollectionLog()) {
+            return;
+        }
+        Widget widget = client.getWidget(InterfaceID.NotificationDisplay.UNIVERSE);
+        if (widget == null) {
+            return;
+        }
+        widget.setHidden(true);
+        hiddenCollectionLogWidget = widget;
+    }
+
+    private void hideInventory() {
+        if (!config.hideInventory()) {
+            return;
+        }
+        Widget widget = client.getWidget(InterfaceID.Inventory.ITEMS);
+        if (widget == null) {
+            return;
+        }
+        widget.setHidden(true);
+        hiddenInvWidget = widget;
+    }
+
+
+    private void restoreHiddenUi() {
+        unhideRewardWidget();
+
+        if (hiddenCollectionLogWidget != null) {
+            hiddenCollectionLogWidget.setHidden(false);
+            hiddenCollectionLogWidget = null;
+        }
+        if (hiddenChatWidget != null) {
+            hiddenChatWidget.setHidden(false);
+            hiddenChatWidget = null;
+        }
+        if (hiddenInvWidget != null) {
+            hiddenInvWidget.setHidden(false);
+            hiddenInvWidget = null;
+        }
+    }
 
     @Subscribe
     public void onLootReceived(LootReceived lootReceived) {
@@ -262,11 +322,15 @@ public class LootCaseOpeningPlugin extends Plugin {
             hideRewardWidget(widgetComponentID);
         }
 
+        hideChat();
+        hideCollectionLogPopup();
+        hideInventory();
+
         caseOpeningOverlay.open(pool, winner, result ->
                 {
                     if (config.playLegendaryJingle() && result.getRarity() == Rarity.LEGENDARY) playLegendarySound();
                 },
-                this::unhideRewardWidget
+                this::restoreHiddenUi
         );
     }
 
