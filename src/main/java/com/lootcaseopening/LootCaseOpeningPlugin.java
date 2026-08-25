@@ -7,12 +7,10 @@ import javax.inject.Inject;
 
 import com.google.inject.Provides;
 import net.runelite.api.Client;
-import net.runelite.api.VarClientInt;
 import net.runelite.api.events.CommandExecuted;
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.WidgetLoaded;
 import net.runelite.api.gameval.InterfaceID;
-import net.runelite.api.gameval.VarClientID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.callback.ClientThread;
