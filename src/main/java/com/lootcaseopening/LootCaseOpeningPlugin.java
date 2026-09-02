@@ -57,6 +57,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private Widget hiddenChatWidget;
     private Widget hiddenCollectionLogWidget;
+    private boolean collectionLogHidePending;
     private Widget hiddenInvWidget;
 
     private final Set<Integer> processedDoomItemIds = new HashSet<>();
@@ -163,6 +164,9 @@ public class LootCaseOpeningPlugin extends Plugin {
                 hideRewardWidget(hideComponentID);
             }
         }
+        if (collectionLogHidePending && widgetLoaded.getGroupId() == WidgetUtil.componentToInterface(InterfaceID.NotificationDisplay.UNIVERSE)) {
+            hideCollectionLogPopup();
+        }
 
         if (widgetLoaded.getGroupId() == WidgetUtil.componentToInterface(InterfaceID.DomEndLevelUi.UNIVERSE)) {
             hideRewardWidget(InterfaceID.DomEndLevelUi.UNIVERSE);
@@ -256,6 +260,7 @@ public class LootCaseOpeningPlugin extends Plugin {
         }
         widget.setHidden(true);
         hiddenCollectionLogWidget = widget;
+        collectionLogHidePending = false;
     }
 
     private void hideInventory() {
@@ -273,6 +278,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private void restoreHiddenUi() {
         unhideRewardWidget();
+        collectionLogHidePending = false;
 
         if (hiddenCollectionLogWidget != null) {
             hiddenCollectionLogWidget.setHidden(false);
@@ -320,6 +326,7 @@ public class LootCaseOpeningPlugin extends Plugin {
             hideRewardWidget(widgetComponentID);
         }
 
+        collectionLogHidePending = config.hideCollectionLog();
         hideChat();
         hideCollectionLogPopup();
         hideInventory();
