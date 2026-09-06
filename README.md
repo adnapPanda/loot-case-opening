@@ -13,6 +13,7 @@ In some content the game already shows you that there is a unique by recoloring 
 - Chambers of Xeric
 - Tombs of Amascut
 - Doom of Mokhaiotl
+- Abyssal Sire(Unsired)
 - Corrupted Gauntlet/Gauntlet
 - Moons of Peril
 - Barrows
