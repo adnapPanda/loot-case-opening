@@ -232,6 +232,17 @@ public final class LootTables {
             new LootEntry(ItemID.ADAMANT_SEED, Rarity.COMMON)
     );
 
+    public static final List<LootEntry> ABYSSAL_SIRE_UNSIRED = List.of(
+            new LootEntry(ItemID.ABYSSALSIRE_PET, Rarity.LEGENDARY),
+            new LootEntry(ItemID.POH_TROPHYDROP_ABYSSALDEMON, Rarity.RARE),
+            new LootEntry(ItemID.JAR_OF_MIASMA, Rarity.RARE),
+            new LootEntry(ItemID.ABYSSAL_DAGGER, Rarity.UNCOMMON),
+            new LootEntry(ItemID.ABYSSAL_BLUDGEON_1, Rarity.UNCOMMON),
+            new LootEntry(ItemID.ABYSSAL_BLUDGEON_2, Rarity.UNCOMMON),
+            new LootEntry(ItemID.ABYSSAL_BLUDGEON_3, Rarity.UNCOMMON),
+            new LootEntry(ItemID.ABYSSAL_WHIP, Rarity.COMMON)
+    );
+
     private LootTables() {
     }
 }

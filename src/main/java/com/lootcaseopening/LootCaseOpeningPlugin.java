@@ -65,7 +65,7 @@ public class LootCaseOpeningPlugin extends Plugin {
 
     private static final List<List<LootEntry>> ALL_LOOT_TABLES = Arrays.asList(
             CORRUPTED_GAUNTLET, THEATRE_OF_BLOOD, CHAMBERS_OF_XERIC,
-            TOMBS_OF_AMASCUT, DOOM, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN, ELVEN_CRYSTAL_CHEST, MOON_CHEST, LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER
+            TOMBS_OF_AMASCUT, DOOM, MOONS_OF_PERIL, BARROWS_CHEST, GRAND_COFFIN, ELVEN_CRYSTAL_CHEST, MOON_CHEST, LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER, ABYSSAL_SIRE_UNSIRED
     );
 
     private static final List<List<LootEntry>> SPAMMABLE_CHESTS = Arrays.asList(ELVEN_CRYSTAL_CHEST, MOON_CHEST, LARRANS_BIG_CHEST, ZOMBIE_PIRATES_LOCKER);
@@ -83,7 +83,8 @@ public class LootCaseOpeningPlugin extends Plugin {
             entry("Elven Crystal Chest", ELVEN_CRYSTAL_CHEST),
             entry("Chest (Moon key)", MOON_CHEST),
             entry("Larran's big chest", LARRANS_BIG_CHEST),
-            entry("Zombie Pirate's Locker", ZOMBIE_PIRATES_LOCKER)
+            entry("Zombie Pirate's Locker", ZOMBIE_PIRATES_LOCKER),
+            entry("Unsired", ABYSSAL_SIRE_UNSIRED)
     );
 
     private static final Map<String, List<LootEntry>> LOOT_TABLE_BY_ARGS = Map.ofEntries(
@@ -98,7 +99,8 @@ public class LootCaseOpeningPlugin extends Plugin {
             entry("crystal", ELVEN_CRYSTAL_CHEST),
             entry("moon", MOON_CHEST),
             entry("larrans", LARRANS_BIG_CHEST),
-            entry("zombie", ZOMBIE_PIRATES_LOCKER)
+            entry("zombie", ZOMBIE_PIRATES_LOCKER),
+            entry("sire", ABYSSAL_SIRE_UNSIRED)
     );
 
     @Override
