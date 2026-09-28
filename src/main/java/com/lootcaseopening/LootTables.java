@@ -117,8 +117,9 @@ public final class LootTables {
 
     public static final List<LootEntry> GRAND_COFFIN = List.of(
             new LootEntry(ItemID.RING_OF_ENDURANCE_UNCHARGED, Rarity.LEGENDARY),
-            //Add both rings since I am unsure which ItemID will be returned
             new LootEntry(ItemID.RING_OF_ENDURANCE, Rarity.LEGENDARY),
+            new LootEntry(ItemID.RING_OF_ENDURANCE_NOCHARGES, Rarity.LEGENDARY),
+            //Add 3 ring ID's since I am unsure which ItemID will be returned
             new LootEntry(ItemID.STRANGE_OLD_LOCKPICK_FULL, Rarity.ULTRA_RARE),
             new LootEntry(ItemID.SANFEW_SALVE_4_DOSE, Rarity.UNCOMMON),
             new LootEntry(ItemID.RANARR_SEED, Rarity.UNCOMMON),
